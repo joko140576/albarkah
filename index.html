@@ -2,145 +2,184 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Display Multimedia</title>
+  <title>Layar Informasi Masjid</title>
   <style>
     body {
       margin: 0;
-      height: 100vh;
+      background: #e0e0e0;
       font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* --- FORM INPUT --- */
+    /* Halaman input */
     #inputPage {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      height: 100vh;
+      justify-content: center;
+      flex: 1;
       gap: 12px;
-    }
-    #inputPage input, #inputPage textarea, #inputPage button {
-      padding: 8px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    #inputPage button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
+      padding: 20px;
     }
 
-    /* --- DISPLAY PAGE --- */
+    #inputPage h2 {
+      margin-bottom: 10px;
+    }
+
+    /* Layout utama */
     #displayPage {
       display: none;
-      height: 100vh;
-      display: grid;
-      grid-template-rows: 1fr auto auto; /* video+image | jadwal | running */
-      gap: 6px;
-      padding: 6px;
-      box-sizing: border-box;
+      flex: 1;
+      flex-direction: column;
+      height: 100%;
     }
 
     .top-row {
       display: grid;
       grid-template-columns: 2fr 1fr;
-      gap: 6px;
+      gap: 8px;
+      flex: 1;
+      padding: 8px;
+    }
+
+    .frame {
+      background: #fff;
+      border-radius: 12px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
     video, img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      border-radius: 12px;
+      object-fit: contain;
+      border-radius: 8px;
     }
 
-    /* --- JADWAL SHOLAT --- */
-    .jadwal {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      background: linear-gradient(135deg, #6dd5ed, #2193b0);
-      border-radius: 12px;
-      color: #fff;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    /* Baris 2: Jadwal sholat */
+    .prayer-row {
+      display: grid;
+      grid-template-columns: 1fr 3fr;
+      background: linear-gradient(90deg, #3bc9db, #4dabf7);
+      color: white;
       font-weight: bold;
-      padding: 6px 0;
+      border-top: 2px solid #1971c2;
+      border-bottom: 2px solid #1971c2;
+      margin-top: -20px;
     }
-    .jadwal-item {
+
+    .time-column {
       display: flex;
       flex-direction: column;
       align-items: center;
-      font-size: 0.9rem;
-    }
-    .jadwal-item span {
-      font-size: 1.1rem;
-      margin-top: 2px;
+      justify-content: center;
+      padding: 8px;
+      border-right: 2px solid #1971c2;
     }
 
-    /* --- RUNNING TEXT --- */
-    .running-text {
-      background: black;
-      color: white;
-      overflow: hidden;
-      white-space: nowrap;
-      font-size: 1.4rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-      border-radius: 8px;
+    #digitalClock {
+      font-size: 28px;
+    }
+
+    #dateNow {
+      font-size: 16px;
+      margin-top: 4px;
+    }
+
+    .prayer-times {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 0;
+      font-size: 24px;
+      line-height: 2;
+    }
+
+    .prayer-times div {
       display: flex;
       align-items: center;
-      height: 2.5em;
+      gap: 4px;
     }
+
+    .prayer-times span {
+      font-size: 16px;
+    }
+
+    /* Baris 3: Running text */
+    .running-text {
+      background: #222;
+      color: yellow;
+      font-size: 24px;
+      font-weight: bold;
+      height: 12vh;        /* lebih ramping */
+      line-height: 10vh;
+      display: flex; 
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      border-top: 5px solid #555;
+      margin-top: 5px;    /* turun sedikit */
+    }
+
     .running-text span {
       display: inline-block;
       padding-left: 100%;
-      animation: marquee 15s linear infinite;
+      animation: marquee 25s linear infinite;
     }
+
     @keyframes marquee {
-      from { transform: translateX(0%); }
-      to { transform: translateX(-100%); }
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
   </style>
 </head>
 <body>
-
-  <!-- PAGE 1: INPUT -->
+  <!-- Halaman Input -->
   <div id="inputPage">
-    <h2>Masukkan File & Teks</h2>
-    <label>Video (maks 10): 
-      <input type="file" id="videoInput" accept="video/*" multiple>
-    </label>
-    <label>Gambar (maks 10): 
-      <input type="file" id="imageInput" accept="image/*" multiple>
-    </label>
-    <label>Teks Berjalan:</label>
-    <textarea id="textInput" rows="3" cols="30"></textarea>
-    <button onclick="mulaiTampilkan()">Mulai Tampilkan</button>
+    <h2>Masukkan File Multimedia</h2>
+    <label>Video (maks 10): <input type="file" id="videoInput" accept="video/*" multiple></label>
+    <label>Gambar (maks 10): <input type="file" id="imageInput" accept="image/*" multiple></label>
+    <label>Running Text: <input type="text" id="textInput" placeholder="Tulis pesan berjalan di sini"></label>
+    <button onclick="startDisplay()">Mulai</button>
   </div>
 
-  <!-- PAGE 2: DISPLAY -->
+  <!-- Halaman Display -->
   <div id="displayPage">
     <!-- Baris 1 -->
     <div class="top-row">
-      <video id="videoPlayer" autoplay muted></video>
-      <img id="imageDisplay" alt="gambar looping">
+      <div class="frame">
+        <video id="videoPlayer" autoplay muted></video>
+      </div>
+      <div class="frame">
+        <img id="imageDisplay" alt="Gambar tampil di sini" />
+      </div>
     </div>
 
     <!-- Baris 2: Jadwal Sholat -->
-    <div class="jadwal">
-      <div class="jadwal-item">🌙<span>Subuh: 04:30</span></div>
-      <div class="jadwal-item">☀️<span>Dzuhur: 12:00</span></div>
-      <div class="jadwal-item">🌤️<span>Ashar: 15:30</span></div>
-      <div class="jadwal-item">🌇<span>Maghrib: 18:00</span></div>
-      <div class="jadwal-item">🌌<span>Isya: 19:15</span></div>
+    <div class="prayer-row">
+      <!-- Kolom kiri -->
+      <div class="time-column">
+        <div id="digitalClock">00:00:00</div>
+        <div id="dateNow">Tanggal</div>
+      </div>
+      <!-- Kolom kanan -->
+      <div class="prayer-times">
+        <div>🕌 Subuh <span>04:30</span></div>
+        <div>🌞 Dzuhur <span>12:00</span></div>
+        <div>🌇 Ashar <span>15:30</span></div>
+        <div>🌆 Maghrib <span>18:00</span></div>
+        <div>🌙 Isya <span>19:15</span></div>
+      </div>
     </div>
 
-    <!-- Baris 3: Running text -->
+    <!-- Baris 3: Running Text -->
     <div class="running-text">
-      <span id="runningText"></span>
+      <span id="runningText">Selamat datang di layar informasi masjid 🌙</span>
     </div>
   </div>
 
@@ -149,42 +188,32 @@
     let imageFiles = [];
     let currentVideo = 0;
     let currentImage = 0;
-    let imageInterval;
 
-    function mulaiTampilkan() {
-      const videoInput = document.getElementById("videoInput").files;
-      const imageInput = document.getElementById("imageInput").files;
+    function startDisplay() {
+      videoFiles = Array.from(document.getElementById("videoInput").files).slice(0, 10);
+      imageFiles = Array.from(document.getElementById("imageInput").files).slice(0, 10);
       const text = document.getElementById("textInput").value;
 
-      if (videoInput.length === 0 || imageInput.length === 0 || !text) {
-        alert("Isi semua input dulu ya!");
-        return;
+      document.getElementById("inputPage").style.display = "none";
+      document.getElementById("displayPage").style.display = "flex";
+
+      if (text) {
+        document.getElementById("runningText").textContent = text;
       }
 
-      // simpan file video (maks 10)
-      videoFiles = Array.from(videoInput).slice(0, 10);
-      // simpan file gambar (maks 10)
-      imageFiles = Array.from(imageInput).slice(0, 10);
+      if (videoFiles.length > 0) {
+        playVideo();
+      }
 
-      // set teks berjalan
-      document.getElementById("runningText").textContent = text;
-
-      // tampilkan halaman display
-      document.getElementById("inputPage").style.display = "none";
-      document.getElementById("displayPage").style.display = "grid";
-
-      // mulai video loop
-      playVideo();
-
-      // mulai gambar loop
-      startImageLoop();
+      if (imageFiles.length > 0) {
+        showImage();
+        setInterval(nextImage, 4000);
+      }
     }
 
     function playVideo() {
-      if (videoFiles.length === 0) return;
       const videoPlayer = document.getElementById("videoPlayer");
-      const url = URL.createObjectURL(videoFiles[currentVideo]);
-      videoPlayer.src = url;
+      videoPlayer.src = URL.createObjectURL(videoFiles[currentVideo]);
       videoPlayer.play();
 
       videoPlayer.onended = function() {
@@ -193,21 +222,31 @@
       };
     }
 
-    function startImageLoop() {
-      if (imageFiles.length === 0) return;
+    function showImage() {
       const imageDisplay = document.getElementById("imageDisplay");
-
-      function showImage() {
-        const url = URL.createObjectURL(imageFiles[currentImage]);
-        imageDisplay.src = url;
-        currentImage = (currentImage + 1) % imageFiles.length;
-      }
-
-      showImage(); // tampilkan pertama kali
-      clearInterval(imageInterval);
-      imageInterval = setInterval(showImage, 5000); // ganti tiap 5 detik
+      imageDisplay.src = URL.createObjectURL(imageFiles[currentImage]);
     }
-  </script>
 
+    function nextImage() {
+      currentImage = (currentImage + 1) % imageFiles.length;
+      showImage();
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById("digitalClock").textContent = `${h}:${m}:${s}`;
+
+      // Tanggal Masehi (Bahasa Indonesia)
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const masehi = now.toLocaleDateString('id-ID', options);
+      document.getElementById("dateNow").textContent = masehi;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
 </body>
 </html>
+
