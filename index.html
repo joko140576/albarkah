@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Masjid Al Barkah · PT SSI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B2E2A;
+    --bg-deep:#082220;
+    --gold-700:#946B23;
+    --gold-500:#B48A38;
+    --gold-300:#DDBD7C;
+    --gold-100:#F1E3C4;
+    --ivory:#FBF6E9;
+    --muted:rgba(251,246,233,0.6);
+    --line:rgba(221,189,124,0.18);
+    --danger:#E08A73;
+    --ok:#8FCBB6;
+    --radius:8px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    height:100%;
+    margin:0;
+    overflow:hidden;
+    background:var(--bg);
+    color:var(--ivory);
+    font-family:'Plus Jakarta Sans',sans-serif;
+  }
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;margin:0;}
+
+  .stage{
+    height:100vh;
+    height:100svh;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    background:radial-gradient(ellipse at 50% -10%, var(--bg-deep) 0%, var(--bg) 60%);
+  }
+  .pattern-bg{position:absolute;inset:0;opacity:0.06;pointer-events:none;z-index:0;}
+
+  /* top bar */
+  .top-bar{
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:1.6vh 2.6vw 0.6vh;
+    position:relative;z-index:1;
+  }
+  .brand-name{font-size:clamp(20px,2.6vw,32px);color:var(--ivory);}
+  .brand-sub{font-size:clamp(11px,1vw,14px);color:var(--gold-300);margin-top:2px;}
+  .loc-pill{
+    border:1px solid var(--line);color:var(--gold-300);
+    font-size:clamp(10px,0.9vw,13px);padding:5px 14px;border-radius:999px;
+  }
+
+  /* center clock */
+  .clock-zone{
+    flex:1 1 auto;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:0.6vh;position:relative;z-index:1;text-align:center;
+    min-height:0;
+  }
+  .masehi{font-size:clamp(12px,1.2vw,17px);color:var(--muted);}
+  .clock{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(64px,12vw,168px);
+    line-height:1;color:var(--ivory);letter-spacing:0.01em;
+    font-variant-numeric:tabular-nums;
+  }
+  .hijri-row{display:flex;align-items:center;gap:8px;font-size:clamp(16px,2vw,26px);color:var(--gold-300);font-family:'Cormorant Garamond',serif;font-style:italic;}
+  .next-prayer{font-size:clamp(12px,1.1vw,16px);color:var(--muted);margin-top:0.4vh;}
+  .next-prayer b{color:var(--gold-300);font-weight:600;}
+
+  /* prayer band */
+  .prayer-band{
+    flex:0 0 auto;
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    background:rgba(0,0,0,0.14);position:relative;z-index:1;
+  }
+  .prayer-grid{display:grid;grid-template-columns:repeat(6,1fr);}
+  .prayer-cell{
+    text-align:center;padding:1.6vh 4px;border-left:1px solid var(--line);position:relative;
+  }
+  .prayer-cell:first-child{border-left:none;}
+  .prayer-cell .label{font-size:clamp(11px,1vw,15px);color:var(--muted);}
+  .prayer-cell .time{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,2.6vw,36px);margin-top:2px;color:var(--ivory);font-variant-numeric:tabular-nums;}
+  .prayer-cell.active .label,.prayer-cell.active .time{color:var(--gold-300);}
+  .prayer-cell.active::after{content:"";position:absolute;bottom:0;left:22%;right:22%;height:2px;background:var(--gold-500);}
+
+  /* ticker */
+  .ticker-bar{
+    flex:0 0 auto;height:4.6vh;min-height:34px;
+    display:flex;align-items:center;background:var(--bg-deep);position:relative;z-index:1;
+    border-top:1px solid var(--line);
+  }
+  .ticker-label{
+    flex:0 0 auto;padding:0 1.4vw;font-size:clamp(10px,0.9vw,13px);color:var(--gold-300);
+    border-right:1px solid var(--line);height:100%;display:flex;align-items:center;white-space:nowrap;
+  }
+  .ticker-track{flex:1 1 auto;overflow:hidden;position:relative;height:100%;}
+  .ticker-content{
+    position:absolute;white-space:nowrap;display:flex;align-items:center;height:100%;
+    font-size:clamp(11px,1vw,14px);color:var(--ivory);
+    animation:ticker-scroll 30s linear infinite;padding-left:100%;
+  }
+  .ticker-content span{margin-right:48px;}
+  .ticker-content .masuk{color:var(--ok);}
+  .ticker-content .keluar{color:var(--danger);}
+  @keyframes ticker-scroll{from{transform:translateX(0);}to{transform:translateX(-100%);}}
+
+  /* admin trigger */
+  .admin-btn{
+    position:fixed;right:14px;bottom:calc(4.6vh + 14px);z-index:5;
+    width:30px;height:30px;border-radius:50%;
+    background:rgba(0,0,0,0.25);border:1px solid var(--line);color:var(--gold-300);
+    font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+    opacity:0.35;
+  }
+  .admin-btn:hover{opacity:1;}
+
+  /* modal */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(6,20,18,0.82);z-index:10;
+    display:none;align-items:center;justify-content:center;padding:24px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#FFFDF8;color:#1D1B15;border-radius:12px;max-width:640px;width:100%;
+    max-height:86vh;overflow-y:auto;padding:26px 28px 30px;
+  }
+  .modal h2{font-size:22px;color:var(--bg);}
+  .modal .close-btn{
+    float:right;background:none;border:none;font-size:20px;cursor:pointer;color:#6B6659;line-height:1;
+  }
+  .modal-section{margin-top:20px;padding-top:16px;border-top:1px solid rgba(11,46,42,0.14);}
+  .modal-section h3{font-size:15px;color:var(--bg);margin-bottom:10px;}
+  .stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;text-align:center;}
+  .stat .label{font-size:11.5px;color:#6B6659;}
+  .stat .value{font-family:'Cormorant Garamond',serif;font-size:21px;margin-top:2px;}
+  .stat.in .value{color:#175147;}
+  .stat.out .value{color:#8C3A2C;}
+  .stat.balance .value{color:#946B23;}
+  table.ledger{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px;}
+  table.ledger th{text-align:left;font-weight:500;color:#6B6659;font-size:11.5px;padding:6px 4px;border-bottom:1px solid var(--bg);}
+  table.ledger td{padding:8px 4px;border-bottom:1px solid rgba(11,46,42,0.12);}
+  table.ledger td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .jenis-masuk{color:#175147;}
+  .jenis-keluar{color:#8C3A2C;}
+  .del-btn{background:none;border:none;color:#6B6659;cursor:pointer;font-size:12px;}
+  .del-btn:hover{color:#8C3A2C;}
+  .add-form{display:grid;grid-template-columns:110px 1fr 90px 110px auto;gap:8px;align-items:end;margin-top:12px;}
+  .add-form label{display:block;font-size:11px;color:#6B6659;margin-bottom:3px;}
+  .add-form input,.add-form select{width:100%;padding:7px 8px;border:1px solid rgba(11,46,42,0.2);border-radius:6px;font-family:inherit;font-size:13px;}
+  .add-btn{background:var(--bg);color:var(--ivory);border:none;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;}
+  .add-btn:hover{background:#175147;}
+  .form-error{grid-column:1/-1;color:#8C3A2C;font-size:12px;}
+  .hijri-adj-row{display:flex;align-items:center;gap:10px;font-size:13px;}
+  .hijri-adj-row button{width:26px;height:26px;border-radius:6px;border:1px solid rgba(11,46,42,0.2);background:#fff;cursor:pointer;}
+
+  @media(max-width:760px){
+    .prayer-grid{grid-template-columns:repeat(3,1fr);}
+    .prayer-cell:nth-child(4){border-left:none;}
+    .prayer-cell:nth-child(n+4){border-top:1px solid var(--line);}
+    .add-form{grid-template-columns:1fr 1fr;}
+    .add-form .add-btn{grid-column:1/-1;}
+    .ticker-label{display:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="pattern-bg">
+    <svg width="100%" height="100%" preserveAspectRatio="none">
+      <defs>
+        <pattern id="star8" width="60" height="60" patternUnits="userSpaceOnUse">
+          <g stroke="#DDBD7C" stroke-width="1" fill="none">
+            <path d="M30 6 L38 22 L54 22 L42 33 L47 49 L30 39 L13 49 L18 33 L6 22 L22 22 Z"/>
+          </g>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#star8)"/>
+    </svg>
+  </div>
+
+  <div class="top-bar">
+    <div>
+      <div class="brand-name">Masjid Al Barkah</div>
+      <div class="brand-sub">PT SSI &nbsp;·&nbsp; Bekasi</div>
+    </div>
+    <div class="loc-pill">Bekasi &amp; sekitarnya</div>
+  </div>
+
+  <div class="clock-zone">
+    <div class="masehi" id="masehi-date">—</div>
+    <div class="clock" id="clock">--:--:--</div>
+    <div class="hijri-row" id="hijri-date">—</div>
+    <div class="next-prayer" id="next-prayer">Memuat jadwal sholat…</div>
+  </div>
+
+  <div class="prayer-band">
+    <div class="prayer-grid" id="prayer-grid">
+      <div class="prayer-cell"><div class="label">Subuh</div><div class="time">--:--</div></div>
+      <div class="prayer-cell"><div class="label">Terbit</div><div class="time">--:--</div></div>
+      <div class="prayer-cell"><div class="label">Dzuhur</div><div class="time">--:--</div></div>
+      <div class="prayer-cell"><div class="label">Ashar</div><div class="time">--:--</div></div>
+      <div class="prayer-cell"><div class="label">Maghrib</div><div class="time">--:--</div></div>
+      <div class="prayer-cell"><div class="label">Isya</div><div class="time">--:--</div></div>
+    </div>
+  </div>
+
+  <div class="ticker-bar">
+    <div class="ticker-label">Laporan Masjid</div>
+    <div class="ticker-track">
+      <div class="ticker-content" id="ticker-content">Memuat data laporan…</div>
+    </div>
+  </div>
+
+  <button class="admin-btn" id="admin-open" aria-label="Kelola laporan masjid" title="Kelola laporan">⚙</button>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <button class="close-btn" id="modal-close" aria-label="Tutup">×</button>
+    <h2>Kelola Masjid Al Barkah</h2>
+
+    <div class="modal-section">
+      <h3>Koreksi tanggal Hijriyah</h3>
+      <div class="hijri-adj-row">
+        <button id="hijri-minus">−1 hari</button>
+        <span id="hijri-adj-label">Koreksi: 0 hari</span>
+        <button id="hijri-plus">+1 hari</button>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>Ringkasan kas</h3>
+      <div class="stat-row">
+        <div class="stat in"><div class="label">Pemasukan</div><div class="value" id="stat-in">Rp 0</div></div>
+        <div class="stat out"><div class="label">Pengeluaran</div><div class="value" id="stat-out">Rp 0</div></div>
+        <div class="stat balance"><div class="label">Saldo</div><div class="value" id="stat-balance">Rp 0</div></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h3>Riwayat transaksi</h3>
+      <table class="ledger">
+        <thead><tr><th style="width:90px;">Tanggal</th><th>Keterangan</th><th style="width:70px;">Jenis</th><th style="width:110px;text-align:right;">Jumlah</th><th style="width:30px;"></th></tr></thead>
+        <tbody id="ledger-body"><tr><td colspan="5">Memuat…</td></tr></tbody>
+      </table>
+
+      <div class="add-form">
+        <div><label for="f-date">Tanggal</label><input type="date" id="f-date"></div>
+        <div><label for="f-desc">Keterangan</label><input type="text" id="f-desc" placeholder="Infaq Jumat, bayar listrik, dsb."></div>
+        <div><label for="f-jenis">Jenis</label><select id="f-jenis"><option value="masuk">Masuk</option><option value="keluar">Keluar</option></select></div>
+        <div><label for="f-jumlah">Jumlah (Rp)</label><input type="number" id="f-jumlah" min="0" step="1000" placeholder="0"></div>
+        <button class="add-btn" id="f-submit">Tambah</button>
+        <div class="form-error" id="f-error" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var LAT = -6.2349, LON = 107.0000, TZ = 7;
+  var HIJRI_KEY = 'masjid_albarkah_hijri_adj';
+  var LEDGER_KEY = 'masjid_albarkah_ledger';
+  var hijriAdj = 0;
+  var ledger = [];
+  var prayerTimesToday = null;
+  var hijriMonths = ['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Syakban','Ramadan','Syawal','Zulkaidah','Zulhijah'];
+  var prayerLabels = ['Subuh','Terbit','Dzuhur','Ashar','Maghrib','Isya'];
+
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+  function toRad(d){ return d*Math.PI/180; }
+  function toDeg(r){ return r*180/Math.PI; }
+  function formatRupiah(n){ return 'Rp ' + Math.round(n).toLocaleString('id-ID'); }
+
+  /* ---------- perhitungan posisi matahari & waktu sholat ---------- */
+  function julianDay(y,m,d){
+    if(m<=2){ y-=1; m+=12; }
+    var A = Math.floor(y/100), B = 2-A+Math.floor(A/4);
+    return Math.floor(365.25*(y+4716)) + Math.floor(30.6001*(m+1)) + d + B - 1524.5;
+  }
+
+  function sunPosition(jd){
+    var D = jd - 2451545.0;
+    var g = ((357.529 + 0.98560028*D) % 360 + 360) % 360;
+    var q = ((280.459 + 0.98564736*D) % 360 + 360) % 360;
+    var L = ((q + 1.915*Math.sin(toRad(g)) + 0.020*Math.sin(toRad(2*g))) % 360 + 360) % 360;
+    var e = 23.439 - 0.00000036*D;
+    var RA = toDeg(Math.atan2(Math.cos(toRad(e))*Math.sin(toRad(L)), Math.cos(toRad(L)))) / 15;
+    RA = ((RA % 24) + 24) % 24;
+    var decl = toDeg(Math.asin(Math.sin(toRad(e))*Math.sin(toRad(L))));
+    var qHours = q/15;
+    var eqt = qHours - RA;
+    if(eqt > 12) eqt -= 24;
+    if(eqt < -12) eqt += 24;
+    return { decl: decl, eqt: eqt };
+  }
+
+  function hourAngle(depressionDeg, decl, lat){
+    var val = (-Math.sin(toRad(depressionDeg)) - Math.sin(toRad(lat))*Math.sin(toRad(decl))) / (Math.cos(toRad(lat))*Math.cos(toRad(decl)));
+    val = Math.max(-1, Math.min(1, val));
+    return toDeg(Math.acos(val)) / 15;
+  }
+
+  function asrHours(decl, lat, factor){
+    var altitude = toDeg(Math.atan(1/(factor + Math.tan(toRad(Math.abs(lat-decl))))));
+    var val = (Math.sin(toRad(altitude)) - Math.sin(toRad(lat))*Math.sin(toRad(decl))) / (Math.cos(toRad(lat))*Math.cos(toRad(decl)));
+    val = Math.max(-1, Math.min(1, val));
+    return toDeg(Math.acos(val)) / 15;
+  }
+
+  function computePrayerTimes(date){
+    var jd = julianDay(date.getFullYear(), date.getMonth()+1, date.getDate());
+    var sp = sunPosition(jd);
+    var noon = 12 + TZ - LON/15 - sp.eqt;
+    var fajr = noon - hourAngle(20, sp.decl, LAT) + 2/60;
+    var sunrise = noon - hourAngle(0.833, sp.decl, LAT) - 2/60;
+    var dhuhr = noon + 2/60;
+    var asr = noon + asrHours(sp.decl, LAT, 1) + 2/60;
+    var maghrib = noon + hourAngle(0.833, sp.decl, LAT) + 2/60;
+    var isha = noon + hourAngle(18, sp.decl, LAT) + 2/60;
+    return [fajr, sunrise, dhuhr, asr, maghrib, isha];
+  }
+
+  function decimalToHHMM(t){
+    t = ((t % 24) + 24) % 24;
+    var h = Math.floor(t);
+    var m = Math.round((t-h)*60);
+    if(m===60){ m=0; h+=1; }
+    h = ((h % 24) + 24) % 24;
+    return pad(h)+':'+pad(m);
+  }
+
+  /* ---------- kalender hijriyah (algoritma tabular) ---------- */
+  function gregorianToHijri(date, adj){
+    var jd = Math.floor(julianDay(date.getFullYear(), date.getMonth()+1, date.getDate())) + 0.5 + (adj||0);
+    var l = jd - 1948440 + 10632;
+    var n = Math.floor((l-1)/10631);
+    l = l - 10631*n + 354;
+    var j = (Math.floor((10985-l)/5316))*(Math.floor((50*l)/17719)) + (Math.floor(l/5670))*(Math.floor((43*l)/15238));
+    l = l - (Math.floor((30-j)/15))*(Math.floor((17719*j)/50)) - (Math.floor(j/16))*(Math.floor((15238*j)/43)) + 29;
+    var month = Math.floor((24*l)/709);
+    var day = l - Math.floor((709*month)/24);
+    var year = 30*n + j - 30;
+    return { day: day, month: hijriMonths[month-1], year: year };
+  }
+
+  function renderMasehiAndHijri(){
+    var d = new Date();
+    var hariNama = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][d.getDay()];
+    var bulanNama = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][d.getMonth()];
+    document.getElementById('masehi-date').textContent = hariNama + ', ' + d.getDate() + ' ' + bulanNama + ' ' + d.getFullYear() + ' M';
+    var h = gregorianToHijri(d, hijriAdj);
+    document.getElementById('hijri-date').textContent = h.day + ' ' + h.month + ' ' + h.year + ' H';
+  }
+
+  function renderPrayerGrid(){
+    var cells = document.querySelectorAll('.prayer-cell');
+    prayerTimesToday.forEach(function(t, i){
+      cells[i].querySelector('.time').textContent = decimalToHHMM(t);
+    });
+  }
+
+  function updateClockAndCountdown(){
+    var now = new Date();
+    document.getElementById('clock').textContent = pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+
+    if(!prayerTimesToday) return;
+    var nowH = now.getHours() + now.getMinutes()/60 + now.getSeconds()/3600;
+    var cells = document.querySelectorAll('.prayer-cell');
+    cells.forEach(function(c){ c.classList.remove('active'); });
+
+    var idx = -1;
+    for(var i=0;i<prayerTimesToday.length;i++){
+      if(prayerTimesToday[i] > nowH){ idx = i; break; }
+    }
+    if(idx === -1) idx = 0;
+    cells[idx].classList.add('active');
+    document.getElementById('next-prayer').innerHTML = 'Menuju <b>' + prayerLabels[idx] + '</b> · ' + decimalToHHMM(prayerTimesToday[idx]);
+  }
+
+  document.getElementById('hijri-minus').addEventListener('click', function(){ hijriAdj -= 1; saveHijriAdj(); refreshHijriUI(); });
+  document.getElementById('hijri-plus').addEventListener('click', function(){ hijriAdj += 1; saveHijriAdj(); refreshHijriUI(); });
+  function refreshHijriUI(){
+    document.getElementById('hijri-adj-label').textContent = 'Koreksi: ' + (hijriAdj>0?'+':'') + hijriAdj + ' hari';
+    renderMasehiAndHijri();
+  }
+
+  function loadHijriAdj(){
+    return window.storage.get(HIJRI_KEY, false).then(function(r){
+      hijriAdj = r && r.value ? parseInt(r.value,10) : 0;
+    }).catch(function(){ hijriAdj = 0; });
+  }
+  function saveHijriAdj(){ window.storage.set(HIJRI_KEY, String(hijriAdj), false).catch(function(){}); }
+
+  /* ---------- laporan masjid ---------- */
+  function loadLedger(){
+    return window.storage.get(LEDGER_KEY, true).then(function(r){
+      ledger = r && r.value ? JSON.parse(r.value) : [];
+    }).catch(function(){ ledger = []; });
+  }
+  function saveLedger(){ return window.storage.set(LEDGER_KEY, JSON.stringify(ledger), true); }
+
+  function escapeHtml(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  function renderLedger(){
+    var body = document.getElementById('ledger-body');
+    body.innerHTML = '';
+    var sorted = ledger.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+    if(sorted.length===0){
+      body.innerHTML = '<tr><td colspan="5">Belum ada catatan.</td></tr>';
+    } else {
+      sorted.forEach(function(item){
+        var tr = document.createElement('tr');
+        var dateDisp = item.date.split('-').reverse().join('-');
+        tr.innerHTML = '<td>'+dateDisp+'</td><td>'+escapeHtml(item.desc)+'</td>'+
+          '<td class="jenis-'+item.jenis+'">'+(item.jenis==='masuk'?'Masuk':'Keluar')+'</td>'+
+          '<td class="num">'+formatRupiah(item.jumlah)+'</td>'+
+          '<td><button class="del-btn" data-id="'+item.id+'">Hapus</button></td>';
+        body.appendChild(tr);
+      });
+    }
+    var totalIn=0, totalOut=0;
+    ledger.forEach(function(it){ if(it.jenis==='masuk') totalIn+=it.jumlah; else totalOut+=it.jumlah; });
+    document.getElementById('stat-in').textContent = formatRupiah(totalIn);
+    document.getElementById('stat-out').textContent = formatRupiah(totalOut);
+    document.getElementById('stat-balance').textContent = formatRupiah(totalIn-totalOut);
+
+    body.querySelectorAll('.del-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        ledger = ledger.filter(function(it){ return it.id !== btn.getAttribute('data-id'); });
+        renderLedger(); renderTicker(); saveLedger().catch(function(){});
+      });
+    });
+  }
+
+  function renderTicker(){
+    var el = document.getElementById('ticker-content');
+    var totalIn=0, totalOut=0;
+    ledger.forEach(function(it){ if(it.jenis==='masuk') totalIn+=it.jumlah; else totalOut+=it.jumlah; });
+    var recent = ledger.slice().sort(function(a,b){ return b.date.localeCompare(a.date); }).slice(0,12);
+    var html = '<span>Saldo kas saat ini: <b>' + formatRupiah(totalIn-totalOut) + '</b></span>';
+    if(recent.length===0){
+      html += '<span>Belum ada transaksi tercatat.</span>';
+    } else {
+      recent.forEach(function(it){
+        var dateDisp = it.date.split('-').reverse().join('-');
+        html += '<span class="'+ (it.jenis==='masuk'?'masuk':'keluar') +'">'+dateDisp+' — '+escapeHtml(it.desc)+' ('+(it.jenis==='masuk'?'+':'-')+formatRupiah(it.jumlah)+')</span>';
+      });
+    }
+    el.innerHTML = html;
+  }
+
+  document.getElementById('f-submit').addEventListener('click', function(){
+    var errEl = document.getElementById('f-error');
+    errEl.style.display = 'none';
+    var date = document.getElementById('f-date').value;
+    var desc = document.getElementById('f-desc').value.trim();
+    var jenis = document.getElementById('f-jenis').value;
+    var jumlah = parseFloat(document.getElementById('f-jumlah').value);
+    if(!date || !desc || !jumlah || jumlah<=0){
+      errEl.textContent = 'Isi tanggal, keterangan, dan jumlah (lebih dari 0) terlebih dahulu.';
+      errEl.style.display = 'block';
+      return;
+    }
+    ledger.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date:date, desc:desc, jenis:jenis, jumlah:jumlah });
+    renderLedger(); renderTicker();
+    document.getElementById('f-desc').value = '';
+    document.getElementById('f-jumlah').value = '';
+    saveLedger().catch(function(){
+      errEl.textContent = 'Catatan gagal disimpan ke penyimpanan. Coba lagi.';
+      errEl.style.display = 'block';
+    });
+  });
+
+  document.getElementById('admin-open').addEventListener('click', function(){
+    document.getElementById('modal-overlay').classList.add('open');
+  });
+  document.getElementById('modal-close').addEventListener('click', function(){
+    document.getElementById('modal-overlay').classList.remove('open');
+  });
+  document.getElementById('modal-overlay').addEventListener('click', function(e){
+    if(e.target === this){ this.classList.remove('open'); }
+  });
+
+  /* ---------- init ---------- */
+  document.getElementById('f-date').valueAsDate = new Date();
+
+  Promise.all([loadHijriAdj(), loadLedger()]).then(function(){
+    refreshHijriUI();
+    renderLedger();
+    renderTicker();
+    prayerTimesToday = computePrayerTimes(new Date());
+    renderPrayerGrid();
+    updateClockAndCountdown();
+    setInterval(updateClockAndCountdown, 1000);
+    setInterval(renderMasehiAndHijri, 60000);
+  });
+})();
+</script>
+
+</body>
+</html>
